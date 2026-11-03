@@ -1,0 +1,80 @@
+# ─────────────────────────────────────────────────────────────
+# Generic Platform Config Template
+# Copy this file, rename it to your platform (e.g. myapp.yaml),
+# and fill in the values below.
+# ─────────────────────────────────────────────────────────────
+name: my_platform               # used in report filenames and titles
+base_url: https://example.com   # no trailing slash
+
+# ── Load test settings ──────────────────────────────────────
+default_iterations: 3           # page visits per user per run
+default_concurrency: 5          # simultaneous users
+delay_between_pages: 0.5        # pause between page hits (seconds)
+request_timeout: 30             # abort if no response after N seconds
+verify_ssl: true                # set false only for self-signed certs in staging
+
+# ── Authentication ────────────────────────────────────────────
+# Choose ONE auth type and configure accordingly.
+
+# --- Option A: Cookie / Session auth (most common) ---
+# The tool POSTs credentials to login_url. The server sets session cookies
+# which aiohttp stores and replays automatically on subsequent requests.
+auth:
+  type: cookie
+  login_url: https://example.com/api/login
+  headers:
+    Content-Type: application/json
+    Accept: application/json
+  payload:
+    email: $username          # $field → resolved from each user entry below
+    password: $password
+  success_status: [200, 302]
+  # Optional: if your API returns 200 even on failure, specify a string
+  # that must appear in the response body for the login to be counted as OK.
+  success_body_contains: ""
+
+# --- Option B: Bearer Token auth ---
+# Uncomment and replace the above auth block with this if your API returns a JWT.
+# auth:
+#   type: bearer
+#   login_url: https://example.com/api/auth/token
+#   headers:
+#     Content-Type: application/json
+#   payload:
+#     username: $username
+#     password: $password
+#   token_path: data.access_token   # dot-notation path to token in JSON response
+
+# ── Dummy / test users ────────────────────────────────────────
+# These are your test accounts. Create them in your staging/test environment.
+# For production load testing, always use dedicated test accounts.
+users:
+  - username: testuser1@example.com
+    password: "<change-me>"
+  - username: testuser2@example.com
+    password: "<change-me>"
+  - username: testuser3@example.com
+    password: "<change-me>"
+
+# ── Pages to load test ───────────────────────────────────────
+# Each entry needs either:
+#   path: /relative/path   (appended to base_url)
+#   url: https://...       (absolute, for external or subdomain pages)
+# Optional per-page headers can override global headers.
+pages:
+  - name: Dashboard
+    path: /dashboard
+
+  - name: Profile
+    path: /profile
+
+  - name: Settings
+    path: /settings/account
+
+  - name: Feed
+    path: /home
+
+  - name: External API Page
+    url: https://api.example.com/v1/data
+    headers:
+      Accept: application/json

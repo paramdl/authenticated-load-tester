@@ -1,0 +1,32 @@
+# Runs against the bundled demo app (python demo/demo_app.py). Safe to run anywhere.
+name: demo_cookie
+base_url: http://127.0.0.1:8080
+
+default_iterations: 5
+default_concurrency: 5
+delay_between_pages: 0.05
+request_timeout: 15
+verify_ssl: false
+
+auth:
+  type: cookie
+  login_url: http://127.0.0.1:8080/api/login
+  headers:
+    Content-Type: application/json
+  payload:
+    email: $username
+    password: $password
+  success_status: [200]
+
+users:
+  - { username: demo1@example.com, password: demo-pass }
+  - { username: demo2@example.com, password: demo-pass }
+  - { username: demo3@example.com, password: demo-pass }
+  - { username: demo4@example.com, password: demo-pass }
+  - { username: demo5@example.com, password: demo-pass }
+
+pages:
+  - { name: Dashboard, path: /dashboard }
+  - { name: Profile, path: /profile }
+  - { name: Reports (slow), path: /reports }
+  - { name: Flaky API, path: /flaky }

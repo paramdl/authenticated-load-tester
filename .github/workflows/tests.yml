@@ -1,0 +1,31 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt pytest
+      - run: pytest -q
+      - name: Demo run with quality gate
+        run: |
+          python demo/demo_app.py &
+          sleep 2
+          python load_tester.py --config configs/demo_cookie.yaml --output reports --max-error-rate 25
+      - uses: actions/upload-artifact@v6
+        if: ${{ !cancelled() }}
+        with:
+          name: load-report
+          path: reports/
+          retention-days: 14

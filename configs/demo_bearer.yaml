@@ -1,0 +1,28 @@
+# Same demo app, Bearer-token login instead of a session cookie.
+name: demo_bearer
+base_url: http://127.0.0.1:8080
+
+default_iterations: 3
+default_concurrency: 3
+delay_between_pages: 0.05
+request_timeout: 15
+verify_ssl: false
+
+auth:
+  type: bearer
+  login_url: http://127.0.0.1:8080/api/token
+  headers:
+    Content-Type: application/json
+  payload:
+    username: $username
+    password: $password
+  token_path: data.token
+
+users:
+  - { username: demo1@example.com, password: demo-pass }
+  - { username: demo2@example.com, password: demo-pass }
+  - { username: demo3@example.com, password: demo-pass }
+
+pages:
+  - { name: Dashboard, path: /dashboard }
+  - { name: Reports (slow), path: /reports }
